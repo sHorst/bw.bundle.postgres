@@ -14,7 +14,6 @@ def _network_address_ipv4(ip, netmask):
 
 @metadata_processor
 def metaproc_add_cidr(metadata):
-    print('test')
     """
     This metadata processor will add a CIDR-style network attribute to
     all configured interfaces. E.g. for
