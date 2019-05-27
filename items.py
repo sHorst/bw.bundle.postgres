@@ -29,7 +29,7 @@ for database_name, database_config in node.metadata.get('postgres', {}).get('dat
 if node.metadata.get('postgres', {}).get('master', False):
     postgres_roles['replication'] = {
         'superuser': True,
-        'password': repo.libs.pw.get('postgres_replication_{}'.format(node.name)),
+        'password': repo.vault.password_for('postgres_replication_{}'.format(node.name)),
         'needs': ['svc_systemv:postgresql']
     }
 
