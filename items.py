@@ -1,4 +1,4 @@
-POSTGRES_VERSION = '9.6'
+POSTGRES_VERSION = '11'
 
 pkg_apt = {
     'postgresql': {},
@@ -42,6 +42,7 @@ for interface in additional_interfaces:
 files = {
     '/etc/postgresql/{}/main/pg_hba.conf'.format(POSTGRES_VERSION): {
         'content_type': 'mako',
+        'mode': '0640',
         'owner': 'postgres',
         'group': 'postgres',
         'needs': ['pkg_apt:postgresql'],
