@@ -1,5 +1,8 @@
 POSTGRES_VERSION = '11'
 
+if node.os == 'debian' and node.os_version[0] == 11:
+    POSTGRES_VERSION = '13'
+
 pkg_apt = {
     'postgresql': {},
     'postgresql-contrib': {}
@@ -23,7 +26,12 @@ for database_name, database_config in node.metadata.get('postgres', {}).get('dat
     }
     postgres_dbs[database_name] = {
         'owner': database_config['owner_name'],
-        'needs': ['pkg_apt:postgresql']
+        'needs': ['pkg_apt:postgresql'],
+        'when_creating': database_config.get('encoding', {
+            "encoding": "UTF8",
+            "collation": "de_DE.UTF8",
+            "ctype": "de_DE.UTF8",
+        }),
     }
 
 if node.metadata.get('postgres', {}).get('master', False):
