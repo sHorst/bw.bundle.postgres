@@ -34,6 +34,13 @@ for database_name, database_config in node.metadata.get('postgres', {}).get('dat
         }),
     }
 
+for role_name, role_config in node.metadata.get('postgres', {}).get('roles', {}).items():
+    postgres_roles[role_name] = {
+        'password': role_config['password'],
+        'superuser': role_config.get('superuser', False),
+        'needs': ['pkg_apt:postgresql'],
+    }
+
 if node.metadata.get('postgres', {}).get('master', False):
     postgres_roles['replication'] = {
         'superuser': True,
