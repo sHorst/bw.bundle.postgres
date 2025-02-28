@@ -2,6 +2,8 @@ POSTGRES_VERSION = '11'
 
 if node.os == 'debian' and node.os_version[0] == 11:
     POSTGRES_VERSION = '13'
+elif node.os == 'debian' and node.os_version[0] == 12:
+    POSTGRES_VERSION = '15'
 
 pkg_apt = {
     'postgresql': {},
@@ -74,30 +76,32 @@ files = {
         'needs': ['pkg_apt:postgresql'],
         'triggers': ['svc_systemv:postgresql:restart']
     },
-    '/etc/cron.d/dump-postgres': {
+}
+
+if node.metadata.get('postgres', {}).get('cron_dump', True):
+    files['/etc/cron.d/dump-postgres'] = {
         'content': '30 23 * * * root /usr/local/sbin/pg-dump-everything\n'
-    },
-    '/usr/local/sbin/pg-dump-everything': {
+    }
+    files['/usr/local/sbin/pg-dump-everything'] = {
         'source': 'pg-dump-everything.sh',
         'mode': '0750'
     }
-}
 
-directories = {
-    '/var/tmp/dumps/postgres': {
-        'group': 'nagios' if node.has_bundle('nrpe') else 'root',
-        'mode': '0750',
-        'needs': ['pkg_apt:nagios-nrpe-server'] if node.has_bundle('nrpe') else []
-    },
-    '/var/tmp/dumps/postgres/dumps': {
-        'group': 'nagios' if node.has_bundle('nrpe') else 'root',
-        'mode': '0750',
-        'needs': ['pkg_apt:nagios-nrpe-server'] if node.has_bundle('nrpe') else []
-    },
-    '/var/tmp/dumps/postgres/status': {
-        'group': 'nagios' if node.has_bundle('nrpe') else 'root',
-        'mode': '0750',
-        'needs': ['pkg_apt:nagios-nrpe-server'] if node.has_bundle('nrpe') else []
+    directories = {
+        '/var/tmp/dumps/postgres': {
+            'group': 'nagios' if node.has_bundle('nrpe') else 'root',
+            'mode': '0750',
+            'needs': ['pkg_apt:nagios-nrpe-server'] if node.has_bundle('nrpe') else []
+        },
+        '/var/tmp/dumps/postgres/dumps': {
+            'group': 'nagios' if node.has_bundle('nrpe') else 'root',
+            'mode': '0750',
+            'needs': ['pkg_apt:nagios-nrpe-server'] if node.has_bundle('nrpe') else []
+        },
+        '/var/tmp/dumps/postgres/status': {
+            'group': 'nagios' if node.has_bundle('nrpe') else 'root',
+            'mode': '0750',
+            'needs': ['pkg_apt:nagios-nrpe-server'] if node.has_bundle('nrpe') else []
+        }
     }
-}
 
